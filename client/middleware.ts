@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { authMiddleware } from "@clerk/nextjs/server";
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
-  const protectedRoutes = ['/dashboard'];
+export default authMiddleware({
+  publicRoutes: ["/", "/login"],
+});
 
-  if (protectedRoutes.includes(request.nextUrl.pathname) && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  return NextResponse.next();
-}
+export const config = {
+  matcher: [
+    "/((?!.*\\..*|_next).*)",
+    "/",
+    "/(api|trpc)(.*)",
+  ],
+};

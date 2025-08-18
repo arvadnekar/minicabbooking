@@ -34,7 +34,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "app/driver/login/...rest/page.tsx", "app/rider/login/...clerk/page.tsx", "app/driver/login/...clerk/page.tsx", "app/rider/login/...rest/page.tsx"  ],
   "exclude": [
     "node_modules"
   ]

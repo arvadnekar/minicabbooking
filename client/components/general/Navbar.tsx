@@ -1,3 +1,4 @@
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "./theme-toggle";
 
 export default function NavBar() {
@@ -9,8 +10,29 @@ export default function NavBar() {
       <a href="/contact" className="hover:text-yellow-300 transition-colors">Contact Us</a>
 
       {/* Theme Toggle Button on the right */}
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-4">
         <ThemeToggle />
+
+        <SignedOut>
+          {/* Sign In redirects existing users to dashboard */}
+          <SignInButton forceRedirectUrl="/dashboard">
+            <button className="bg-gray-700 text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-gray-600 transition-colors">
+              Sign In
+            </button>
+          </SignInButton>
+
+          {/* Sign Up redirects new users to role selection */}
+          <SignUpButton forceRedirectUrl="/select-role">
+            <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-purple-600 transition-colors">
+              Sign Up
+            </button>
+          </SignUpButton>
+        </SignedOut>
+
+        <SignedIn>
+          {/* User menu */}
+          <UserButton afterSignOutUrl="/" />
+        </SignedIn>
       </div>
     </nav>
   );

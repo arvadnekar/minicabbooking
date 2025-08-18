@@ -1,22 +1,37 @@
-'use client';
+// client/components/general/ProtectedRoute.tsx
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useUser } from "@clerk/nextjs";
+import { useEffect, ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+interface Props {
+  allowedRoles: string[];
+  children: ReactNode;
+}
+
+export default function ProtectedRoute({ allowedRoles, children }: Props) {
+  const { user, isSignedIn } = useUser();
+  const [role, setRole] = useState<string | null>(null);
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-    } else {
-      setIsAuthenticated(true);
+    if (!isSignedIn || !user) {
+      router.push("/driver/login");
+      return;
     }
-  }, []);
 
-  if (!isAuthenticated) return <p>Checking auth...</p>;
+    // Example: get role from user public metadata
+    const userRole = user.publicMetadata.role as string | undefined;
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      router.push("/unauthorized"); // redirect if role not allowed
+    } else {
+      setRole(userRole);
+    }
+  }, [isSignedIn, user, allowedRoles, router]);
+
+  if (!isSignedIn || !user || !role) return <p>Loading...</p>;
 
   return <>{children}</>;
 }
