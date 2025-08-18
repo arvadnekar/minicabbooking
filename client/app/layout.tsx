@@ -1,12 +1,12 @@
-import NavBar from "@/components/general/Navbar";
-import "./globals.css";
-import { ThemeProvider } from "next-themes";
 import Footer from "@/components/general/Footer";
+import NavBar from "@/components/general/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "next-themes";
+import "./globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider publishableKey="pk_test_aHVtYW5lLWFudC0yNC5jbGVyay5hY2NvdW50cy5kZXYk">
+    <ClerkProvider >
       <html lang="en" suppressHydrationWarning>
         <body className="flex flex-col min-h-screen">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

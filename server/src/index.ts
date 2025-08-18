@@ -1,0 +1,68 @@
+import {
+  clerkClient,
+  clerkMiddleware,
+  getAuth,
+  requireAuth,
+} from "@clerk/express";
+import cors from "cors";
+import "dotenv/config";
+import express from "express";
+import mongoose from "mongoose";
+
+const app = express();
+const PORT = 3000;
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+
+app.use(
+  clerkMiddleware({
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.CLERK_SECRET_KEY,
+  })
+);
+
+app.get("/", (req, res) => {
+  res.send("Welcome to the homepage!");
+});
+
+app.get("/api/user/role", async (req, res) => {
+  console.log("Req", req.headers);
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const user = await clerkClient.users.getUser(userId);
+  res.json({ user });
+});
+
+// Use requireAuth() to protect this route
+// If user is not authenticated, requireAuth() will redirect back to the homepage
+app.get("/protected", requireAuth(), async (req, res) => {
+  // Use `getAuth()` to get the user's `userId`
+  // or you can use `req.auth`
+  const { userId } = getAuth(req);
+
+  // Use Clerk's JavaScript Backend SDK to get the user's User object
+  const user = await clerkClient.users.getUser(userId);
+
+  res.json({ user });
+});
+
+// Assuming you have a template engine installed and are using a Clerk JavaScript SDK on this page
+app.get("/sign-in", (req, res) => {
+  res.render("sign-in");
+});
+
+mongoose
+  .connect(process.env.MONGO_URI || "")
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.log(err));
+
+// Start the server and listen on the specified port
+app.listen(PORT, () => {
+  console.log(`Example app listening at http://localhost:${PORT}`);
+});

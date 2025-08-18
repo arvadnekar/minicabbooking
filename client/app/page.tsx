@@ -1,8 +1,8 @@
 'use client';
 
+import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import clsx from 'clsx';
 
 export default function Home() {
   const router = useRouter();
@@ -11,6 +11,10 @@ export default function Home() {
   const handleSelect = (role: 'driver' | 'rider') => {
     router.push(`/${role}/${authType}`);
   };
+
+  const handleLogin = () => {
+    router.push('/signin')
+  }
 
   const authButtons = [
     { type: 'login', label: 'Login', color: 'blue' },
@@ -65,7 +69,7 @@ export default function Home() {
             return (
               <button
                 key={btn.role}
-                onClick={() => handleSelect(btn.role as 'rider' | 'driver')}
+                onClick={handleLogin}
                 className={`px-8 py-3 text-white rounded-lg shadow-md transition-transform duration-200 transform hover:scale-105 ${bgClass}`}
               >
                 {btn.label}

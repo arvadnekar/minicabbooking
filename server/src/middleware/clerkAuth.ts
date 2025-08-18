@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { NextFunction, Request, Response } from "express";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
-const JWKS = createRemoteJWKSet(new URL('https://api.clerk.com/v1/jwks'));
+const JWKS = createRemoteJWKSet(new URL("https://api.clerk.com/v1/jwks"));
 
 export async function clerkAuthMiddleware(
   req: Request,
@@ -11,11 +11,10 @@ export async function clerkAuthMiddleware(
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader)
-      return res.status(401).json({ message: 'Missing auth token' });
+      return res.status(401).json({ message: "Missing auth token" });
 
-    const token = authHeader.split(' ')[1]; // Bearer <token>
-    if (!token)
-      return res.status(401).json({ message: 'Invalid token' });
+    const token = authHeader.split(" ")[1]; // Bearer <token>
+    if (!token) return res.status(401).json({ message: "Invalid token" });
 
     // Verify JWT using JWKS
     const { payload } = await jwtVerify(token, JWKS);
@@ -25,6 +24,6 @@ export async function clerkAuthMiddleware(
 
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Unauthorized', error: err });
+    return res.status(401).json({ message: "Unauthorized", error: err });
   }
 }

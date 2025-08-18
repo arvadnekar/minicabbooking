@@ -15,14 +15,14 @@ export default function NavBar() {
 
         <SignedOut>
           {/* Sign In redirects existing users to dashboard */}
-          <SignInButton forceRedirectUrl="/dashboard">
+          <SignInButton>
             <button className="bg-gray-700 text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-gray-600 transition-colors">
               Sign In
             </button>
           </SignInButton>
 
           {/* Sign Up redirects new users to role selection */}
-          <SignUpButton forceRedirectUrl="/select-role">
+          <SignUpButton>
             <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-purple-600 transition-colors">
               Sign Up
             </button>
@@ -31,7 +31,7 @@ export default function NavBar() {
 
         <SignedIn>
           {/* User menu */}
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </SignedIn>
       </div>
     </nav>
