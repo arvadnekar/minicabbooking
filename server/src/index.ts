@@ -30,7 +30,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/user/role", async (req, res) => {
-  console.log("Req", req.headers);
   const { userId } = getAuth(req);
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
