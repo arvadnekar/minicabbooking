@@ -1,20 +1,7 @@
-// import { authMiddleware } from "@clerk/nextjs/server";
-
-// export default authMiddleware({
-//   publicRoutes: ["/", "/login"],
-// });
-
-// export const config = {
-//   matcher: [
-//     "/((?!.*\\..*|_next).*)",
-//     "/",
-//     "/(api|trpc)(.*)",
-//   ],
-// };
-
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/signin(.*)", "/signup(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/signin(.*)", "/signup(.*)","/contact(.*)",   // 👈 Added this
+  "/about(.*)"  ]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {

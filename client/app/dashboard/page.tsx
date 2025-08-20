@@ -11,7 +11,7 @@ export default function DashboardPage() {
     const fetchUserRole = async () => {
       const token = await getToken(); // 🔑 Clerk session token
 
-      const res = await fetch("http://localhost:5000/api/user/role", {
+      const res = await fetch("http://localhost:3000/api/user/role", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

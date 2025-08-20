@@ -2,16 +2,21 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function OnboardingPage() {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+
+//useEffect backend call to check if user is onboarded or not
+
   const handleSelect = async (role: "driver" | "rider") => {
     if (!user) return;
     setLoading(true);
+
+    //api call to backend /api/user/onboarding => body json: role, header bearer token ref to /app/user/page.tsx
 
     // Save to Clerk (frontend only for now)
     await user.update({
@@ -20,6 +25,7 @@ export default function OnboardingPage() {
 
     // Redirect based on role
     if (role === "rider") {
+
       router.push("/rider/dashboard");
     } else {
       router.push("/driver/dashboard");
