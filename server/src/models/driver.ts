@@ -1,35 +1,40 @@
-import mongoose, { Schema, Document, model } from 'mongoose';
+import { getModelForClass, modelOptions, prop, Ref } from '@typegoose/typegoose';
+import { User } from './User';
 
-export interface IDriver extends Document {
-  name: string;
-  license: string;
-  vehicle: {
-    make: string;
-    model: string;
-    plateNumber: string;
-  };
-  clerkUserId: string; // reference to Clerk user
-  createdAt: Date;
-  updatedAt: Date;
+
+@modelOptions({
+  options: { customName: 'drivers' },
+  schemaOptions: {
+    timestamps: true
+  }
+})
+export class Driver {
+  @prop({ ref: () => User, required: true })
+  public userId!: Ref<User>; // Reference to User table (_id)
+
+  @prop({ type: String, required: true })
+  public externalUserId!: string; // Clerk user ID
+
+  @prop({ type: String, required: true })
+  public name!: string;
+
+  @prop({ type: Number })
+  public age?: number;
+
+  @prop({ type: String, required: true })
+  public licenseNumber!: string;
+
+  @prop({ type: String })
+  public province?: string;
+
+  @prop({ type: String })
+  public vehicleModel?: string;
+
+  @prop({ type: Number })
+  public vehicleYear?: number;
+
+  @prop({ type: String })
+  public plateNumber?: string;
 }
 
-const VehicleSchema = new Schema(
-  {
-    make: { type: String, required: true },
-    model: { type: String, required: true },
-    plateNumber: { type: String, required: true },
-  },
-  { _id: false } // prevents creating separate _id for vehicle
-);
-
-const DriverSchema = new Schema<IDriver>(
-  {
-    name: { type: String, required: true },
-    license: { type: String, required: true },
-    vehicle: { type: VehicleSchema, required: true },
-    clerkUserId: { type: String, required: true },
-  },
-  { timestamps: true }
-);
-
-export default model<IDriver>('Driver', DriverSchema);
+export const DriverTable = getModelForClass(Driver);
