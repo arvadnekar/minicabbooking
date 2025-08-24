@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { UserTable } from "../models/User";
 const router = express.Router();
 
-router.post("/sync", async (req: Request, res: Response) => {
+router.post("/sync", async (req, res) => {
   const {
     externalUserId,
     emailId,

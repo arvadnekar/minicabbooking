@@ -1,8 +1,8 @@
 import 'express';
 
 declare module 'express' {
-  export interface Request extends Express.Request {
-    userId?: string; // userId added by middleware
+  export interface Request {
+    // userId?: string; // userId added by middleware
     auth?: {
       userId: string;
       sessionId: string;
@@ -10,7 +10,4 @@ declare module 'express' {
     };
   }
 
-  export interface Response extends Express.Response {
-    
-  }
 }

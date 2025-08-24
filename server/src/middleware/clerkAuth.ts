@@ -1,12 +1,11 @@
-import { NextFunction, type Request, type Response } from "express";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const JWKS = createRemoteJWKSet(new URL("https://api.clerk.com/v1/jwks"));
 
 export async function clerkAuthMiddleware(
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req,
+  res,
+  next
 ) {
   try {
     const authHeader = req.headers.authorization;
