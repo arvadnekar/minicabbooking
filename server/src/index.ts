@@ -6,7 +6,7 @@ import {
 } from "@clerk/express";
 import cors from "cors";
 import "dotenv/config";
-import express from "express";
+import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import { connectToDatabase } from "../config/db";
 import { onboardingRouter } from "./routes/onboarding";
@@ -30,11 +30,11 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to the homepage!");
 });
 
-app.get("/api/user/role", async (req, res) => {
+app.get("/api/user/role", async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -65,23 +65,23 @@ app.get("/api/user/role", async (req, res) => {
 
 app.use("/api/onboarding", onboardingRouter);
 
-app.use("/api/user", requireAuth(), userRouter)
+app.use("/api/user", requireAuth(), userRouter);
 
 // Use requireAuth() to protect this route
 // If user is not authenticated, requireAuth() will redirect back to the homepage
-app.get("/protected", requireAuth(), async (req, res) => {
+app.get("/protected", requireAuth(), async (req: Request, res: Response) => {
   // Use `getAuth()` to get the user's `userId`
   // or you can use `req.auth`
   const { userId } = getAuth(req);
 
   // Use Clerk's JavaScript Backend SDK to get the user's User object
-  const user = await clerkClient.users.getUser(userId);
+  const user = await clerkClient.users.getUser(userId as string);
 
   res.json({ user });
 });
 
 // Assuming you have a template engine installed and are using a Clerk JavaScript SDK on this page
-app.get("/sign-in", (req, res) => {
+app.get("/sign-in", (req: Request, res: Response) => {
   res.render("sign-in");
 });
 
