@@ -35,7 +35,7 @@ app.get("/api/user/role", async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
   const user = await clerkClient.users.getUser(userId);
-  res.json({ user });
+  res.status(200).json({ user });
 });
 
 
@@ -53,7 +53,7 @@ app.get("/protected", requireAuth(), async (req: Request, res: Response) => {
   // Use Clerk's JavaScript Backend SDK to get the user's User object
   const user = await clerkClient.users.getUser(userId as string);
 
-  res.json({ user });
+  res.status(200).json({ user });
 });
 
 // Assuming you have a template engine installed and are using a Clerk JavaScript SDK on this page
