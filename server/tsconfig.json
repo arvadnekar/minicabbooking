@@ -23,13 +23,15 @@
   "include": [
     "./src/**/*",
     "config/**/*",
-    "./**/*.ts", "./src/*.ts", "../../libs/*.ts", "./src/models"
+    "./**/*.ts", "./src/*.ts", "../../libs/*.ts", "./src/models",
+    
   ],
   "exclude": [
     "./node_modules/*",
     "./dist",
     "./**/*.spec.ts",
     "./**/*.spec.js",
-    "./node_modules/*"
+    "./node_modules/*",
+    "./src/models/*.ts"
   ]
 }
