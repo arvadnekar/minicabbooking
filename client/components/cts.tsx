@@ -17,7 +17,7 @@ export default function Ctasection() {
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
               <Link href="/about">About Us</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-6">
+            <Button size="lg" variant="outline" className="border-white text-black hover:bg-white hover:text-blue-600 text-lg px-8 py-6">
               Become a Driver
             </Button>
           </div>

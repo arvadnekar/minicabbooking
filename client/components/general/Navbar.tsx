@@ -42,12 +42,21 @@ export default function Navbar() {
             {/* Right-side buttons */}
             <div className="flex items-center gap-4">
               <SignedOut>
-                <SignInButton>
+                <SignInButton mode="modal"
+                  forceRedirectUrl="/onboarding"
+                  signUpForceRedirectUrl="/onboarding"
+                   fallbackRedirectUrl="/onboarding"
+                   signUpFallbackRedirectUrl="/onboarding">
+
                   <button className="bg-gray-700 text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-gray-600 transition-colors">
                     Sign In
                   </button>
                 </SignInButton>
-                <SignUpButton>
+                <SignUpButton mode="modal"
+                  forceRedirectUrl="/onboarding"
+                  signInForceRedirectUrl="/onboarding"
+                   fallbackRedirectUrl="/onboarding"
+                   signInFallbackRedirectUrl="/onboarding">
                   <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-purple-600 transition-colors">
                     Drive with us
                   </button>
@@ -82,12 +91,20 @@ export default function Navbar() {
             ))}
             <div className="pt-4 pb-3 border-t border-gray-200 flex flex-col gap-2">
               <SignedOut>
-                <SignInButton>
+                <SignInButton mode="modal"
+                  forceRedirectUrl="/onboarding"
+                  signUpForceRedirectUrl="/onboarding"
+                   fallbackRedirectUrl="/onboarding"
+                   signUpFallbackRedirectUrl="/onboarding">
                   <button className="w-full bg-gray-700 text-white rounded-md h-10 hover:bg-gray-600 transition-colors">
                     Sign In
                   </button>
                 </SignInButton>
-                <SignUpButton>
+                <SignUpButton mode="modal"
+                  forceRedirectUrl="/onboarding"
+                  signInForceRedirectUrl="/onboarding"
+                   fallbackRedirectUrl="/onboarding"
+                   signInFallbackRedirectUrl="/onboarding">
                   <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-md h-10 hover:from-blue-700 hover:to-purple-700 transition-colors">
                     Drive with us
                   </button>
