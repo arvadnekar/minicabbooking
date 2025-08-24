@@ -30,10 +30,6 @@ app.use(
   })
 );
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to the homepage!");
-});
-
 app.get("/api/user/role", async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   if (!userId) {
