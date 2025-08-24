@@ -139,25 +139,28 @@
   * {
     @apply border-border outline-ring/50;
   }
-@layer components {
-  .feature-icon svg {
-    @apply text-primary; /* default color */
-  }
-  /* You can define different variants */
-  .feature-icon.car svg {
-    @apply text-primary;
-  }
-  .feature-icon.shield svg {
-    @apply text-accent;
-  }
-  .feature-icon.map svg {
-    @apply text-secondary;
-  }
-  .feature-icon.clock svg {
-    @apply text-destructive;
-  }
-}
+
   body {
     @apply bg-background text-foreground;
   }
+  
+  @layer components {
+    .feature-icon svg {
+      @apply text-primary; /* default color */
+    }
+    /* You can define different variants */
+    .feature-icon.car svg {
+      @apply text-primary;
+    }
+    .feature-icon.shield svg {
+      @apply text-accent;
+    }
+    .feature-icon.map svg {
+      @apply text-secondary;
+    }
+    .feature-icon.clock svg {
+      @apply text-destructive;
+    }
+  }
+  
 }
