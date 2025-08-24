@@ -10,11 +10,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en" suppressHydrationWarning>
         <body className="flex flex-col min-h-screen">
           <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
 
           <Navbar />
           <div className="flex-grow py-5 mx-2 pt-20 md:mx-36 text-xl [&_p]:my-6">
