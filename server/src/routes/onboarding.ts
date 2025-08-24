@@ -1,7 +1,7 @@
 import express from 'express';
 import { requireAuth } from '@clerk/express';
-import { UserTable } from '../models/user';
-import { DriverTable } from '../models/driver';
+import { UserTable } from '../models/User';
+import { DriverTable } from '../models/Driver';
 
 
 
