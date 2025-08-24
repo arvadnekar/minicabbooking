@@ -1,5 +1,5 @@
 import express from "express";
-import { UserTable } from "../models/User";
+import { UserTable } from "../models/user";
 const router = express.Router();
 
 router.post("/sync", async (req, res) => {
