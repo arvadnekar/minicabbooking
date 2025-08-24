@@ -31,6 +31,10 @@ app.use(
   })
 );
 
+app.get("/health", (_req, res) => {
+  res.status(200).send("OK");
+})
+
 app.get("/api/user/role", async (req, res) => {
   const { userId } = getAuth(req);
   if (!userId) {
