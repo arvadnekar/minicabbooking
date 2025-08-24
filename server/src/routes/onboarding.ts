@@ -1,13 +1,14 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { requireAuth } from '@clerk/express';
 import { UserTable } from '../models/User';
 import { DriverTable } from '../models/Driver';
 
 
+
 const router = express.Router();
 
 // 1. GET /onboardingStatus - Get user's onboarding status and role
-router.get('/status', requireAuth(), async (req: Request, res: Response) => {
+router.get('/status', requireAuth(), async (req, res) => {
   const { userId } = req.auth as { userId: string };
   try {
     const user = await UserTable.findOne({ externalUserId: userId });
@@ -19,7 +20,7 @@ router.get('/status', requireAuth(), async (req: Request, res: Response) => {
 });
 
 // 2. POST /onboard/rider - Complete onboarding as rider
-router.post('/rider', requireAuth(), async (req: Request, res: Response) => {
+router.post('/rider', requireAuth(), async (req, res) => {
   const { userId } = req.auth as { userId: string };
   const { name, emailId, province, username } = req.body;
   try {
@@ -44,7 +45,7 @@ router.post('/rider', requireAuth(), async (req: Request, res: Response) => {
 });
 
 // 3. POST /onboard/driver - Complete onboarding as driver
-router.post('/driver', requireAuth(), async (req: Request, res: Response) => {
+router.post('/driver', requireAuth(), async (req, res) => {
   const { userId } = req.auth as { userId: string };
   console.log("Onboarding driver for userId:", userId);
   const {
