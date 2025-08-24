@@ -6,8 +6,7 @@ import {
 } from "@clerk/express";
 import cors from "cors";
 import "dotenv/config";
-import express, { Request, Response } from "express";
-import mongoose from "mongoose";
+import express, {type Request, type Response} from "express"
 import { connectToDatabase } from "../config/db";
 import { onboardingRouter } from "./routes/onboarding";
 import { userRouter } from "./routes/user";
@@ -38,26 +37,7 @@ app.get("/api/user/role", async (req: Request, res: Response) => {
   const user = await clerkClient.users.getUser(userId);
   res.json({ user });
 });
-// app.get("/api/user/onboardingstatus", requireAuth(), async (req, res) => {
-//   const { userId } = getAuth(req);
-//   // try {
-//   //   const user = await User.findOne({ clerkId: userId });
-//   //   if (!user) {
-//   //     return res.status(404).json({ error: "User not found" });
-//   //   }
-//   //   res.json({
-//   //     onboarded: user.onboarded,
-//   //     role: user.role,
-//   //   });
-//   // } catch (err) {
-//   //   res.status(500).json({ error: "Server error" });
-//   // }
-//   if (userId) {
-//     res.json({ onboarded: false});
-//   } else {
-//     res.status(404).json({ error: "User not found" });
-//   }
-// });
+
 
 app.use("/api/onboarding", onboardingRouter);
 
@@ -81,10 +61,6 @@ app.get("/sign-in", (req: Request, res: Response) => {
   res.render("sign-in");
 });
 
-// mongoose
-//   .connect(process.env.MONGO_URI || "")
-//   .then(() => console.log("MongoDB connected"))
-//   .catch((err) => console.log(err));
 
 // Start the server and listen on the specified port
 app.listen(PORT, async () => {

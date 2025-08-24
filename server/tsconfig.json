@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "NodeNext",
     "target": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
+    "lib": ["ES2023"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -13,7 +14,8 @@
     "baseUrl": "./src",
     "typeRoots": [
       "./src/type",
-      "./node_modules/@types"
+      "./node_modules/@types",
+      "node"
     ]
   },
   "include": [
