@@ -23,7 +23,7 @@
   "include": [
     "./src/**/*",
     "config/**/*",
-    "./**/*.ts", "./src/*.ts", "../../libs/*.ts", "./src/models",
+    "./**/*.ts", "./src/*.ts", "../../libs/*.ts"
     
   ],
   "exclude": [
