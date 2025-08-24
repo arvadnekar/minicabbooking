@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { clerkAuthMiddleware } from '../middleware/clerkAuth';
-import driver from '../models/driver';
+import { DriverTable } from '../models/Driver';
+
 
 const router = express.Router();
 
@@ -11,18 +12,34 @@ router.post(
     const userId = req.userId;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-    const { name, license, vehicle } = req.body;
-
-    const newDriver = new driver({
+    const {
       name,
-      license,
-      vehicle,
-      clerkUserId: userId,
-    });
+      age,
+      licenseNumber,
+      vehicleModel,
+      vehicleYear,
+      plateNumber,
+      province,
+      userTableId, // Pass User _id from frontend if available
+    } = req.body;
 
-    await newDriver.save();
+    try {
+      const newDriver = await DriverTable.create({
+        name,
+        age,
+        licenseNumber,
+        vehicleModel,
+        vehicleYear,
+        plateNumber,
+        province,
+        externalUserId: userId,
+        userId: userTableId, // Reference to User table (_id)
+      });
 
-    res.status(201).json({ message: 'Driver created', driver: newDriver });
+      res.status(201).json({ message: 'Driver created', driver: newDriver });
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating driver', error });
+    }
   }
 );
 
