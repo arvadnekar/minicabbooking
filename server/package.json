@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts"
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit --pretty"
   },
   "devDependencies": {
     "@types/cors": "~2.8.19",

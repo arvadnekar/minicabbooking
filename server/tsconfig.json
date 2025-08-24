@@ -8,8 +8,11 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": false,
+    "noUnusedParameters": true,
     "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "strict": true, // Enables all strict type-checking options
     "baseUrl": "./src",
     "typeRoots": [
@@ -18,7 +21,15 @@
     ]
   },
   "include": [
-    "src/**/*",
-    "config/**/*"
+    "./src/**/*",
+    "config/**/*",
+    "./**/*.ts", "./src/*.ts", "../../libs/*.ts", "./src/models"
+  ],
+  "exclude": [
+    "./node_modules/*",
+    "./dist",
+    "./**/*.spec.ts",
+    "./**/*.spec.js",
+    "./node_modules/*"
   ]
 }
