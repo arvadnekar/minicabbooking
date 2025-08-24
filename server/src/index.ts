@@ -6,7 +6,7 @@ import {
 } from "@clerk/express";
 import cors from "cors";
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import express from "express";
 import { connectToDatabase } from "../config/db";
 import { onboardingRouter } from "./routes/onboarding";
 import { userRouter } from "./routes/user";
@@ -29,7 +29,7 @@ app.use(
   })
 );
 
-app.get("/api/user/role", async (req: Request, res: Response) => {
+app.get("/api/user/role", async (req, res) => {
   const { userId } = getAuth(req);
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -44,7 +44,7 @@ app.use("/api/user", requireAuth(), userRouter);
 
 // Use requireAuth() to protect this route
 // If user is not authenticated, requireAuth() will redirect back to the homepage
-app.get("/protected", requireAuth(), async (req: Request, res: Response) => {
+app.get("/protected", requireAuth(), async (req, res) => {
   // Use `getAuth()` to get the user's `userId`
   // or you can use `req.auth`
   const { userId } = getAuth(req);
