@@ -9,7 +9,7 @@ export default function UserPage() {
  const fetchUserRole = async () => {
       const token = await getToken(); // 🔑 Clerk session token
       console.log("Token: ", token);
-      const res = await fetch("http://localhost:3000/api/user/role", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/role`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

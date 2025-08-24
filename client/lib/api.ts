@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3000/api'; // Your backend base URL
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL; // Your backend base URL
 
 export const loginUser = async (credentials: { email: string; password: string }) => {
   const res = await fetch(`${API_BASE}/auth/login`, {

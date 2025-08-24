@@ -19,7 +19,7 @@ export default function OnboardingPage() {
     const syncUser = async () => {
       if (user && isSignedIn) {
         const token = await getToken();
-        await fetch("http://localhost:3000/api/user/sync", {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/sync`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     const fetchOnboardingStatus = async () => {
       const token = await getToken();
-      const response = await fetch("http://localhost:3000/api/onboarding/status", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/onboarding/status`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ export default function OnboardingPage() {
 
   const registerRider = async () => {
     const token = await getToken();
-    await fetch("http://localhost:3000/api/onboarding/rider", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/onboarding/rider`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
