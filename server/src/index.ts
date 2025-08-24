@@ -8,6 +8,9 @@ import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
+import { connectToDatabase } from "../config/db";
+import { onboardingRouter } from "./routes/onboarding";
+import { userRouter } from "./routes/user";
 
 const app = express();
 const PORT = 3000;
@@ -17,6 +20,8 @@ app.use(
     origin: "*",
   })
 );
+
+app.use(express.json());
 
 app.use(
   clerkMiddleware({
@@ -37,6 +42,30 @@ app.get("/api/user/role", async (req, res) => {
   const user = await clerkClient.users.getUser(userId);
   res.json({ user });
 });
+// app.get("/api/user/onboardingstatus", requireAuth(), async (req, res) => {
+//   const { userId } = getAuth(req);
+//   // try {
+//   //   const user = await User.findOne({ clerkId: userId });
+//   //   if (!user) {
+//   //     return res.status(404).json({ error: "User not found" });
+//   //   }
+//   //   res.json({
+//   //     onboarded: user.onboarded,
+//   //     role: user.role,
+//   //   });
+//   // } catch (err) {
+//   //   res.status(500).json({ error: "Server error" });
+//   // }
+//   if (userId) {
+//     res.json({ onboarded: false});
+//   } else {
+//     res.status(404).json({ error: "User not found" });
+//   }
+// });
+
+app.use("/api/onboarding", onboardingRouter);
+
+app.use("/api/user", requireAuth(), userRouter)
 
 // Use requireAuth() to protect this route
 // If user is not authenticated, requireAuth() will redirect back to the homepage
@@ -56,12 +85,19 @@ app.get("/sign-in", (req, res) => {
   res.render("sign-in");
 });
 
-mongoose
-  .connect(process.env.MONGO_URI || "")
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
+// mongoose
+//   .connect(process.env.MONGO_URI || "")
+//   .then(() => console.log("MongoDB connected"))
+//   .catch((err) => console.log(err));
 
 // Start the server and listen on the specified port
-app.listen(PORT, () => {
-  console.log(`Example app listening at http://localhost:${PORT}`);
+app.listen(PORT, async () => {
+  try {
+    await connectToDatabase();
+    console.log("Database connected");
+    console.log(`Example app listening at http://localhost:${PORT}`);
+  } catch (err) {
+    console.error("Failed to connect to database.", err);
+    process.exit(1); // Exit if DB connection fails
+  }
 });
