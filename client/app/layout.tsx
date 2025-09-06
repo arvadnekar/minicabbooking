@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Navbar from "@/components/general/Navbar";
+import { Separator } from "@/components/ui/separator";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="flex-grow py-5 mx-2 pt-20 md:mx-36 text-xl [&_p]:my-6">
             {children}
           </div>
+          <Separator />
           <Footer />
         </ThemeProvider>
         </body>
