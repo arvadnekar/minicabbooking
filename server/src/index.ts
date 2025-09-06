@@ -9,9 +9,12 @@ import {
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
 import { connectToDatabase } from "../config/db";
 import { onboardingRouter } from "./routes/onboarding";
 import { userRouter } from "./routes/user";
+import { ridesRouter, setupRideSocketHandlers } from "routes/rides";
 
 const app = express();
 const PORT = 3000;
@@ -48,6 +51,8 @@ app.use("/api/onboarding", onboardingRouter);
 
 app.use("/api/user", requireAuth(), userRouter);
 
+app.use("/api/rides", requireAuth(), ridesRouter);
+
 // Use requireAuth() to protect this route
 // If user is not authenticated, requireAuth() will redirect back to the homepage
 app.get("/protected", requireAuth(), async (req, res) => {
@@ -61,14 +66,36 @@ app.get("/protected", requireAuth(), async (req, res) => {
   res.status(200).json({ user });
 });
 
-// Start the server and listen on the specified port
-app.listen(PORT, async () => {
+// Create HTTP server and attach Socket.IO
+const server = http.createServer(app);
+export const io = new SocketIOServer(server, {
+  cors: { origin: "*" }
+});
+
+// Driver connection logic (optional, or move to rides if you want)
+// io.on("connection", (socket) => {
+//   console.log("Driver connected:", socket.id);
+
+//   socket.on("joinDriversRoom", () => {
+//     socket.join("drivers");
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("Driver disconnected:", socket.id);
+//   });
+// });
+
+// Setup ride-related socket handlers
+setupRideSocketHandlers(io);
+
+// Start the server
+server.listen(PORT, async () => {
   try {
     await connectToDatabase();
     console.log("Database connected");
     console.log(`Example app listening at http://localhost:${PORT}`);
   } catch (err) {
     console.error("Failed to connect to database.", err);
-    process.exit(1); // Exit if DB connection fails
+    process.exit(1);
   }
 });
