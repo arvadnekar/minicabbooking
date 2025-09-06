@@ -8,13 +8,12 @@ export default function ContactInformation(){
     return (
         <>
         <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
-        <div className="space-y-6">
+        <div className="space-y-6 text-base ">
               <div className="flex items-center gap-x-4">
                 <div className="bg-primary/10 p-3 rounded-full">
                   <Mail className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <span className="font-medium ">Email</span>
                   <Link href={'mailto:akankshavadnerkar00@gmail.com'}>akankshavadnerkar00@gmail.com</Link>
                 </div>
               </div>
@@ -24,7 +23,6 @@ export default function ContactInformation(){
                   <Phone className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <span className="font-medium">Phone</span>
                   <Link href={'tel:+1-709-853-5214'}>+1 (709) 853-5211</Link>
                 </div>
               </div>
@@ -34,8 +32,7 @@ export default function ContactInformation(){
                   <MapPin className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <span className="font-medium">Location</span>
-                  <span className="text-muted-foreground">Canada</span>
+                  <span className="text-medium">Canada</span>
                 </div>
               </div>
             </div>
