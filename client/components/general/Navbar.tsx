@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Car, Menu, X } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "./theme-toggle";
+import { Button } from "../ui/button";
 
 const navLinks = [
   { href: "/about", label: "About Us" },
-  { href: "#services", label: "Services" },
+  { href: "/#services", label: "Services" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -16,7 +17,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b">
+    <header className="fixed top-0 left-0 right-0 z-50 shadow-sm border-b bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -24,7 +25,7 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Car className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">MiniCab</span>
+            <span className="text-xl font-bold ">MiniCab</span>
           </div>
 
           {/* Desktop nav */}
@@ -33,7 +34,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-700 hover:text-emerald-600 transition-colors px-3 py-2 text-sm font-medium"
+                className="transition-colors px-3 py-2 text-sm font-medium"
               >
                 {link.label}
               </Link>
@@ -48,18 +49,18 @@ export default function Navbar() {
                    fallbackRedirectUrl="/onboarding"
                    signUpFallbackRedirectUrl="/onboarding">
 
-                  <button className="bg-gray-700 text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-gray-600 transition-colors">
+                  <Button >
                     Sign In
-                  </button>
+                  </Button>
                 </SignInButton>
                 <SignUpButton mode="modal"
                   forceRedirectUrl="/onboarding"
                   signInForceRedirectUrl="/onboarding"
                    fallbackRedirectUrl="/onboarding"
                    signInFallbackRedirectUrl="/onboarding">
-                  <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm h-10 px-4 hover:bg-purple-600 transition-colors">
+                  <Button>
                     Drive with us
-                  </button>
+                  </Button>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
@@ -70,10 +71,10 @@ export default function Navbar() {
           </nav>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <div className="md:hidden pr-4">
+            <Button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -96,18 +97,18 @@ export default function Navbar() {
                   signUpForceRedirectUrl="/onboarding"
                    fallbackRedirectUrl="/onboarding"
                    signUpFallbackRedirectUrl="/onboarding">
-                  <button className="w-full bg-gray-700 text-white rounded-md h-10 hover:bg-gray-600 transition-colors">
+                  <Button>
                     Sign In
-                  </button>
+                  </Button>
                 </SignInButton>
                 <SignUpButton mode="modal"
                   forceRedirectUrl="/onboarding"
                   signInForceRedirectUrl="/onboarding"
                    fallbackRedirectUrl="/onboarding"
                    signInFallbackRedirectUrl="/onboarding">
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-md h-10 hover:from-blue-700 hover:to-purple-700 transition-colors">
+                  <Button>
                     Drive with us
-                  </button>
+                  </Button>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
