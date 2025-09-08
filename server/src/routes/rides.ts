@@ -2,6 +2,8 @@ import { requireAuth } from '@clerk/express';
 import express from 'express';
 import { io } from 'index';
 import { RidesTable } from 'models/Ride';
+import { DriverTable } from 'models/Driver'; // Add this import
+import { UserTable } from 'models/User';
 
 
 const router = express.Router();
@@ -62,34 +64,116 @@ router.post('/request', requireAuth(), async (req, res) => {
     }
 });
 
+router.get('/active', requireAuth(), async (req, res) => {
+  const { userId } = req.auth as { userId: string };
+  const role = req.query.role; // 'driver' or 'rider'
+  let ride;
+  if (role === 'driver') {
+    ride = await RidesTable.findOne({ assignedDriver: userId, status: 'ongoing' });
+  } else {
+    ride = await RidesTable.findOne({ userId, status: 'ongoing' });
+  }
+  // Instead of 404, always return 200 with ride or null
+  res.status(200).json(ride || null);
+});
+
 export function setupRideSocketHandlers(io) {
   io.on("connection", (socket) => {
     console.log("Driver connected:", socket.id);
 
+    // Driver joins drivers room
     socket.on("joinDriversRoom", () => {
       socket.join("drivers");
       console.log(`Socket ${socket.id} joined drivers room`);
     });
 
-    socket.on("accept-ride", async ({ rideId, driverId }) => {
+    // Driver accepts ride
+    socket.on("accept-ride", async ({ rideId, driverId, location }) => {
       try {
         const ride = await RidesTable.findByIdAndUpdate(
           rideId,
-          { assignedDriverId: driverId, status: "accepted" },
+          { assignedDriverId: driverId, status: "accepted", driverInitialLocation: location },
           { new: true }
         );
         if (ride) {
-          io.to("drivers").emit("ride-updated", { rideId, status: "accepted", assignedDriverId: driverId });
-          console.log(`Emitted ride-updated to drivers for ride ${rideId}`);
+          // Fetch driver and user info
+          const driver = await DriverTable.findOne({ externalUserId: driverId });
+          const user = await UserTable.findOne({ externalUserId: driverId });
+          const driverImageUrl = user?.imgUrl || "https://randomuser.me/api/portraits/men/1.jpg";
+          const driverName = user?.name || driver?.name || "Driver";
+          const car = driver?.vehicleModel
+            ? `${driver.vehicleModel} (${driver.plateNumber || ""})`
+            : "Car";
+
+          // Notify rider with driver details
+          io.to(`rider-${ride.userId}`).emit("driver-assigned", {
+            rideId,
+            driverId,
+            name: driverName,
+            car,
+            phone: "Not shared",
+            imageUrl: driverImageUrl,
+          });
         }
       } catch (err) {
         console.error("Error accepting ride:", err);
       }
     });
 
-    socket.on("reject-ride", async ({ rideId, driverId }) => {
-      console.log(`Driver ${driverId} rejected ride ${rideId}`);
-      // Optionally handle rejection logic here
+    function getDistanceMeters(a, b) {
+      if (!a || !b) return null;
+      const R = 6371e3;
+      const φ1 = (a.lat * Math.PI) / 180;
+      const φ2 = (b.lat * Math.PI) / 180;
+      const Δφ = ((b.lat - a.lat) * Math.PI) / 180;
+      const Δλ = ((b.lng - a.lng) * Math.PI) / 180;
+      const x =
+        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const y = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+      return R * y;
+    }
+
+    // Driver sends location update every 5 seconds
+    socket.on("driver-location", async ({ rideId, driverId, location }) => {
+      const ride = await RidesTable.findById(rideId);
+      if (ride) {
+        io.to(`rider-${ride.userId}`).emit("driver-location", {
+          rideId,
+          driverId,
+          location,
+        });
+
+        // Check if driver is near pickup location (e.g., < 200 meters)
+        const pickup = ride.pickupLocation;
+        const distance = getDistanceMeters(location, pickup);
+        if (distance !== null && distance < 200 && ride.status !== "arrived") {
+          await RidesTable.findByIdAndUpdate(rideId, { status: "arrived" });
+          io.to(`rider-${ride.userId}`).emit("driver-arrived", { rideId, driverId });
+        }
+      }
+    });
+
+    // Rider joins their own room for updates
+    socket.on("joinRiderRoom", ({ userId }) => {
+      socket.join(`rider-${userId}`);
+      console.log(`Rider ${userId} joined their room`);
+    });
+
+    // Driver starts ride
+    socket.on("start-ride", async ({ rideId, driverId }) => {
+      try {
+        const ride = await RidesTable.findByIdAndUpdate(
+          rideId,
+          { status: "in_progress" },
+          { new: true }
+        );
+        if (ride) {
+          io.to(`rider-${ride.userId}`).emit("driver-arrived", { rideId, driverId });
+        }
+      } catch (err) {
+        console.error("Error starting ride:", err);
+      }
     });
 
     socket.on("disconnect", () => {
