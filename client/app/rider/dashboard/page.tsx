@@ -1,10 +1,12 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
 import { GoogleMap, Marker, useLoadScript, Autocomplete, DirectionsRenderer } from "@react-google-maps/api";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
+import io from "socket.io-client";
+import { useRef, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Navigation } from "lucide-react";
+import axios from "axios";
 
 const BASE_FARE = 5;
 const PER_KM = 1.5;
@@ -25,7 +27,7 @@ function calculateFareFromDirections(directions: google.maps.DirectionsResult | 
 }
 
 export default function RiderDashboard() {
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [pickupCoords, setPickupCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -33,6 +35,10 @@ export default function RiderDashboard() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [pickupManuallyChanged, setPickupManuallyChanged] = useState(false);
+  const [driverInfo, setDriverInfo] = useState<any>(null);
+  const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [driverArrived, setDriverArrived] = useState(false);
+  const socketRef = useRef<any>(null);
 
   const pickupRef = useRef<google.maps.places.Autocomplete | null>(null);
   const dropoffRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -63,6 +69,63 @@ export default function RiderDashboard() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pickupManuallyChanged]);
+
+  useEffect(() => {
+    socketRef.current = io("http://localhost:3000");
+    if (userId) {
+      socketRef.current.emit("joinRiderRoom", { userId });
+    }
+    socketRef.current.on(
+      "driver-assigned",
+      (payload: { driverId: string; name: string; car: string; phone: string; imageUrl: string }) => {
+        setDriverInfo({
+          id: payload.driverId,
+          name: payload.name,
+          car: payload.car,
+          phone: payload.phone,
+          imageUrl: payload.imageUrl,
+        });
+      }
+    );
+    socketRef.current.on("driver-location", (payload: { location: { lat: number; lng: number } }) => {
+      setDriverLocation(payload.location);
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    async function fetchActiveRide() {
+      if (!userId) return;
+      try {
+        const token = await getToken();
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/active?role=rider`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.data) {
+          // Set pickup/dropoff, etc.
+          setPickupCoords({
+            lat: res.data.pickupLocation.lat,
+            lng: res.data.pickupLocation.lng,
+          });
+          setDropoffCoords({
+            lat: res.data.dropoffLocation.lat,
+            lng: res.data.dropoffLocation.lng,
+          });
+          // Optionally set driver info if assigned
+          if (res.data.assignedDriver) {
+            setDriverInfo({ id: res.data.assignedDriver });
+          }
+        }
+      } catch (err) {
+        // No active ride or error
+      }
+    }
+    fetchActiveRide();
+  }, [userId]);
 
   const autocompleteOptions =
     isLoaded && userLocation
@@ -246,6 +309,35 @@ export default function RiderDashboard() {
         </CardContent>
       </Card>
 
+      {/* Show driver info if assigned */}
+      {driverInfo && (
+        <div className="bg-green-100 text-green-900 rounded-lg px-4 py-3 mb-4 flex items-center gap-4">
+          <img
+            src={driverInfo.imageUrl}
+            alt="Driver"
+            className="w-16 h-16 rounded-full border-2 border-green-400 object-cover"
+          />
+          <div>
+            <div>
+              <span className="font-semibold">Driver:</span> {driverInfo.name}
+            </div>
+            <div>
+              <span className="font-semibold">Car:</span> {driverInfo.car}
+            </div>
+            <div>
+              <span className="font-semibold">Phone:</span> {driverInfo.phone}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Driver arrival notification */}
+      {driverArrived && (
+        <div className="bg-green-100 text-green-900 rounded-lg px-4 py-3 mb-4">
+          Your driver has arrived at the pickup location!
+        </div>
+      )}
+
       {/* Map */}
       <div className="w-full max-w-4xl h-[500px] rounded-xl overflow-hidden shadow-lg">
         <GoogleMap
@@ -256,6 +348,17 @@ export default function RiderDashboard() {
           {pickupCoords && <Marker position={pickupCoords} label="P" />}
           {dropoffCoords && <Marker position={dropoffCoords} label="D" />}
           {directions && <DirectionsRenderer directions={directions} />}
+          {/* Show driver marker if location available */}
+          {driverLocation && (
+            <Marker
+              position={driverLocation}
+              label="🚗"
+              icon={{
+                url: "https://cdn-icons-png.flaticon.com/512/12689/12689302.png", // Flaticon car icon
+                scaledSize: new window.google.maps.Size(40, 40),
+              }}
+            />
+          )}
         </GoogleMap>
       </div>
     </div>
