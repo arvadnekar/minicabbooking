@@ -12,6 +12,14 @@ export class Location {
   public address!: string;
 }
 
+export class SimpleLocation {
+  @prop({ required: true, type: Number })
+  public lat!: number;
+
+  @prop({ required: true, type: Number })
+  public lng!: number;
+}
+
 export class Feedback {
   @prop({ type: String })
   public byRider?: string;
@@ -24,7 +32,8 @@ export enum RideStatus {
   Ongoing = "ongoing",
   Completed = "completed",
   Cancelled = "cancelled",
-  Accepted = "accepted"
+  Accepted = "accepted",
+  Arrived = "arrived",
 }
 
 @modelOptions({
@@ -94,6 +103,11 @@ export class Ride {
 
   @prop({ enum: RideStatus, required: true, default: RideStatus.Ongoing, type: String })
   public status!: RideStatus;
+
+  @prop({ _id: false, type: () => SimpleLocation, default: null })
+  public driverInitialLocation?: SimpleLocation;
 }
+
+
 
 export const RidesTable = getModelForClass(Ride);
