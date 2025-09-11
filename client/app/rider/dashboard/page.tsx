@@ -312,7 +312,7 @@ export default function RiderDashboard() {
               onClick={async () => {
                 try {
                   const token = await getToken();
-                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rides/request`, {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rides/request`, {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -484,7 +484,7 @@ export default function RiderDashboard() {
             <AlertDialogAction
               disabled={rating === 0}
               onClick={async () => {
-                await fetch("/api/feedback", {
+                await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({

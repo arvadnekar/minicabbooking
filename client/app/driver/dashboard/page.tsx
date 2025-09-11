@@ -258,8 +258,10 @@ export default function DriverDetails() {
       if (!userId) return;
       try {
         const token = await getToken();
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
         const res = await axios.get(
-          "/api/rides/active?role=driver",
+          `${apiBaseUrl}/rides/active?role=driver`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (res.data) {
