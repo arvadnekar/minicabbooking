@@ -169,10 +169,30 @@ export function setupRideSocketHandlers(io) {
           { new: true }
         );
         if (ride) {
-          io.to(`rider-${ride.userId}`).emit("driver-arrived", { rideId, driverId });
+          io.to(`rider-${ride.userId}`).emit("start-ride", { rideId, driverId });
         }
       } catch (err) {
         console.error("Error starting ride:", err);
+      }
+    });
+
+    // Driver completes ride
+    socket.on("ride-completed", async ({ rideId, driverId }) => {
+      try {
+        // Update ride status to completed
+        const ride = await RidesTable.findByIdAndUpdate(
+          rideId,
+          { status: "completed", completedTime: new Date() },
+          { new: true }
+        );
+        if (ride) {
+          // Notify rider that ride is completed
+          io.to(`rider-${ride.userId}`).emit("ride-completed", { rideId, driverId });
+          // Optionally, notify driver as well
+          socket.emit("ride-completed", { rideId });
+        }
+      } catch (err) {
+        console.error("Error completing ride:", err);
       }
     });
 
