@@ -47,7 +47,6 @@ router.post('/rider', requireAuth(), async (req, res) => {
 // 3. POST /onboard/driver - Complete onboarding as driver
 router.post('/driver', requireAuth(), async (req, res) => {
   const { userId } = req.auth as { userId: string };
-  console.log("Onboarding driver for userId:", userId);
   const {
     name,
     emailId,
@@ -60,7 +59,6 @@ router.post('/driver', requireAuth(), async (req, res) => {
     plateNumber,
   } = req.body;
 
-  console.log("Driver onboarding data:", req.body);
   try {
     // Update or create user as driver
     const user = await UserTable.findOneAndUpdate(
@@ -79,10 +77,8 @@ router.post('/driver', requireAuth(), async (req, res) => {
     );
 
     if(!user) {
-      console.log("User not found after update");
       return res.status(404).json({ error: 'User not found after update' });
     }
-    console.log("User after update:", user);
 
     // Create driver profile
     const driver = await DriverTable.create({
@@ -98,7 +94,6 @@ router.post('/driver', requireAuth(), async (req, res) => {
     });
 
     if(!driver) {
-      console.log("Failed to create driver profile");
       return res.status(500).json({ error: 'Failed to create driver profile' });
     }
 
