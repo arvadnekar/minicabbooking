@@ -16,6 +16,7 @@ import { onboardingRouter } from "./routes/onboarding";
 import { userRouter } from "./routes/user";
 import { ridesRouter, setupRideSocketHandlers } from "routes/rides";
 import https from 'https';
+import fs from "fs";
 
 const app = express();
 const options = {
