@@ -82,7 +82,7 @@ export default function RiderDashboard() {
   }, [pickupManuallyChanged]);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000");
+    socketRef.current = io(process.env.NEXT_PUBLIC_WEBSOCKET_URL);
     if (userId) {
       socketRef.current.emit("joinRiderRoom", { userId });
     }
@@ -308,7 +308,7 @@ export default function RiderDashboard() {
               onClick={async () => {
                 try {
                   const token = await getToken();
-                  const res = await fetch(`http://localhost:3000/api/rides/request`, {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rides/request`, {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",

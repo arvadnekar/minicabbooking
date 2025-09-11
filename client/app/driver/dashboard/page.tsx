@@ -53,7 +53,7 @@ export default function DriverDetails() {
   });
 
   useEffect(() => {
-    const socketIo = io("http://localhost:3000", {
+    const socketIo = io(process.env.NEXT_PUBLIC_WEBSOCKET_URL, {
       transports: ["websocket"],
     });
 
