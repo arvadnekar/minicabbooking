@@ -8,7 +8,6 @@ export default function UserPage() {
 
  const fetchUserRole = async () => {
       const token = await getToken(); // 🔑 Clerk session token
-      console.log("Token: ", token);
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/role`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -18,7 +17,6 @@ export default function UserPage() {
       if (!res.ok) throw new Error("Unauthorized");
 
       const data = await res.json();
-      console.log("Data Received: ", data);
     };
 
   return (
