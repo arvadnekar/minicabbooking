@@ -40,7 +40,12 @@ export default function DriverDetails() {
     lng: -52.7126,
   });
   const [pickupCoords, setPickupCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [dropoffCoords, setDropoffCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [rideStarted, setRideStarted] = useState(false);
+  const [rideCompleted, setRideCompleted] = useState(false);
+  const [routePath, setRoutePath] = useState<google.maps.LatLngLiteral[]>([]);
+  const [routeIndex, setRouteIndex] = useState(0);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
@@ -55,22 +60,18 @@ export default function DriverDetails() {
     setSocket(socketIo);
 
     const onConnect = () => {
-      console.log("Socket connected:", socketIo.id);
       socketIo.emit("joinDriversRoom");
     };
 
     const onDisconnect = () => {
-      console.log("Socket disconnected");
     };
 
     const onNewRide = (ride: any) => {
-      console.log("Received new-ride event:", ride);
       setNewRide(ride);
       setDialogOpen(true);
     };
 
     const onRideUpdated = (data: any) => {
-      console.log("Ride updated:", data);
       // Optionally update UI or remove ride from list if accepted
     };
 
@@ -107,12 +108,16 @@ export default function DriverDetails() {
     }
   }, []);
 
-  // When a new ride is received, set pickupCoords
+  // When a new ride is received, set pickupCoords and dropoffCoords
   useEffect(() => {
-    if (newRide && newRide.pickupLocation) {
+    if (newRide && newRide.pickupLocation && newRide.dropoffLocation) {
       setPickupCoords({
         lat: newRide.pickupLocation.lat,
         lng: newRide.pickupLocation.lng,
+      });
+      setDropoffCoords({
+        lat: newRide.dropoffLocation.lat,
+        lng: newRide.dropoffLocation.lng,
       });
     }
   }, [newRide]);
@@ -145,6 +150,19 @@ export default function DriverDetails() {
     }
   }, [isLoaded, driverLocation, pickupCoords]);
 
+  // Extract route path from directions
+  useEffect(() => {
+    if (directions) {
+      // Extract overview_path as array of LatLngLiteral
+      const path = directions.routes[0].overview_path.map((latLng) => ({
+        lat: latLng.lat(),
+        lng: latLng.lng(),
+      }));
+      setRoutePath(path);
+      setRouteIndex(0);
+    }
+  }, [directions]);
+
   // Helper to calculate distance in meters
   function getDistanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
     if (!a || !b) return null;
@@ -171,7 +189,6 @@ export default function DriverDetails() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Driver details:", form);
     router.push("/driver/dashboard");
   };
 
@@ -190,7 +207,6 @@ export default function DriverDetails() {
   const handleAcceptRide = () => {
     if (!socket || !newRide || !userId) return;
 
-    // Get driver's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -214,13 +230,16 @@ export default function DriverDetails() {
           const pickup = newRide.pickupLocation;
 
           locationIntervalRef.current = setInterval(() => {
-            // Move a small step toward pickup
-            const step = 0.0005;
+            const step = 0.0010;
             const latDiff = pickup.lat - movingLocation.lat;
             const lngDiff = pickup.lng - movingLocation.lng;
             const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
-            if (distance < step) return; // Already at/near pickup
-
+            if (distance < step) {
+              clearInterval(locationIntervalRef.current!);
+              // Optionally, force a re-render or update state to show the Start Ride button
+              setDriverLocation({ lat: pickup.lat, lng: pickup.lng });
+              return;
+            }
             movingLocation = {
               lat: movingLocation.lat + (latDiff / distance) * step,
               lng: movingLocation.lng + (lngDiff / distance) * step,
@@ -233,9 +252,9 @@ export default function DriverDetails() {
             });
           }, 5000);
 
-          // Hide dialog and clear newRide
           setDialogOpen(false);
-          setNewRide(null);
+          // Do NOT clear newRide here!
+          // setNewRide(null);
         },
         (err) => {
           alert("Location permission denied. Please allow location access to accept rides.");
@@ -283,6 +302,23 @@ export default function DriverDetails() {
     fetchActiveRide();
   }, [userId]);
 
+  useEffect(() => {
+    if (
+      socket &&
+      newRide &&
+      userId &&
+      isNearPickup &&
+      !rideStarted
+    ) {
+      socket.emit("driver-arrived", {
+        rideId: newRide._id,
+        driverId: userId,
+      });
+    }
+    // Only run when isNearPickup changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNearPickup]);
+
   return (
     <div className="flex flex-col items-center p-6">
       {/* Dialog for new ride */}
@@ -321,22 +357,34 @@ export default function DriverDetails() {
             zoom={15}
             center={driverLocation || pickupCoords || { lat: 47.5615, lng: -52.7126 }}
           >
+            {/* Always show driver marker */}
             {driverLocation && (
               <Marker
                 position={driverLocation}
                 icon={{
-                url: "https://cdn-icons-png.flaticon.com/512/12689/12689302.png", // Flaticon car icon
-                scaledSize: new window.google.maps.Size(40, 40),
-              }}
-                
+                  url: "https://cdn-icons-png.flaticon.com/512/12689/12689302.png",
+                  scaledSize: new window.google.maps.Size(40, 40),
+                }}
               />
             )}
-            {pickupCoords && (
+            {/* Show pickup marker only before ride starts */}
+            {pickupCoords && !rideStarted && (
               <Marker
                 position={pickupCoords}
                 label="P"
                 icon={{
                   url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                  scaledSize: new window.google.maps.Size(40, 40),
+                }}
+              />
+            )}
+            {/* Show dropoff marker only after ride starts */}
+            {dropoffCoords && rideStarted && (
+              <Marker
+                position={dropoffCoords}
+                label="D"
+                icon={{
+                  url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
                   scaledSize: new window.google.maps.Size(40, 40),
                 }}
               />
@@ -347,26 +395,97 @@ export default function DriverDetails() {
       </div>
 
       {/* Status Message */}
-      {pickupCoords && driverLocation && !isNearPickup && (
+      {pickupCoords && driverLocation && !rideStarted && !isNearPickup && (
         <div className="bg-yellow-100 text-yellow-900 rounded-lg px-4 py-3 mb-4">
           You are not near the pickup location yet.
         </div>
       )}
-      {pickupCoords && driverLocation && isNearPickup && (
-        <div className="bg-green-100 text-green-900 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
-          <span>You have arrived at the pickup location!</span>
+      {pickupCoords && driverLocation && !rideStarted && isNearPickup && (
+        <div className="bg-green-100 text-green-900 rounded-lg px-4 py-3 mb-4 flex items-center justify-between w-full max-w-2xl">
+          <span>
+            <b>You have arrived at the pickup location!</b>
+          </span>
           <Button
             className="ml-4"
             onClick={() => {
-              if (socket && newRide && userId) {
+              if (socket && newRide && userId && dropoffCoords) {
+                // Only emit start-ride when button is clicked
                 socket.emit("start-ride", {
                   rideId: newRide._id,
                   driverId: userId,
                 });
+                setRideStarted(true);
+
+                // Start moving driver toward dropoff every 5 seconds
+                if (locationIntervalRef.current) clearInterval(locationIntervalRef.current);
+
+                let movingLocation = { ...driverLocation };
+                locationIntervalRef.current = setInterval(() => {
+                  const step = 0.0005;
+                  const latDiff = dropoffCoords.lat - movingLocation.lat;
+                  const lngDiff = dropoffCoords.lng - movingLocation.lng;
+                  const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+                  if (distance < step) {
+                    clearInterval(locationIntervalRef.current!);
+                    setDriverLocation({ lat: dropoffCoords.lat, lng: dropoffCoords.lng });
+                    setRideCompleted(true);
+                    socket.emit("ride-completed", {
+                      rideId: newRide._id,
+                      driverId: userId,
+                    });
+                    return;
+                  }
+                  movingLocation = {
+                    lat: movingLocation.lat + (latDiff / distance) * step,
+                    lng: movingLocation.lng + (lngDiff / distance) * step,
+                  };
+                  setDriverLocation(movingLocation);
+                  socket.emit("driver-location", {
+                    rideId: newRide._id,
+                    driverId: userId,
+                    location: movingLocation,
+                  });
+                }, 5000);
               }
             }}
           >
             Start Ride
+          </Button>
+        </div>
+      )}
+
+      {/* Ride completed notification */}
+      {rideCompleted && (
+        <div className="bg-blue-100 text-blue-900 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
+          <span>You have reached the destination. Ride completed!</span>
+          <Button
+            className="ml-4"
+            onClick={() => {
+              // Reset ride state so driver can accept new rides and map refreshes
+              setRideCompleted(false);
+              setRideStarted(false);
+              setNewRide(null);
+              setPickupCoords(null);
+              setDropoffCoords(null);
+              setDirections(null);
+
+              // Optionally, reset driver location to current GPS location
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    setDriverLocation({
+                      lat: pos.coords.latitude,
+                      lng: pos.coords.longitude,
+                    });
+                  },
+                  () => {
+                    // fallback: keep previous location
+                  }
+                );
+              }
+            }}
+          >
+            Complete Ride
           </Button>
         </div>
       )}
