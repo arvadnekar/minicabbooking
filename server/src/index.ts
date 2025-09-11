@@ -15,9 +15,15 @@ import { connectToDatabase } from "../config/db";
 import { onboardingRouter } from "./routes/onboarding";
 import { userRouter } from "./routes/user";
 import { ridesRouter, setupRideSocketHandlers } from "routes/rides";
+import https from 'https';
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const options = {
+  key: fs.readFileSync("./privkey.pem"),
+  cert: fs.readFileSync("./fullchain.pem"),
+};
+
+const PORT = process.env.PORT || 443;
 
 app.use(
   cors({
@@ -67,7 +73,7 @@ app.get("/protected", requireAuth(), async (req, res) => {
 });
 
 // Create HTTP server and attach Socket.IO
-const server = http.createServer(app);
+const server = https.createServer(options, app);
 export const io = new SocketIOServer(server, {
   cors: { origin: "*" }
 });
