@@ -26,7 +26,6 @@ export default function DriverForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting form:", form, isSignedIn, user);
     if (!isSignedIn || !user) return;
 
     const token = await getToken();
