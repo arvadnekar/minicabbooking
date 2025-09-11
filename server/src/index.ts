@@ -17,7 +17,7 @@ import { userRouter } from "./routes/user";
 import { ridesRouter, setupRideSocketHandlers } from "routes/rides";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 80;
 
 app.use(
   cors({
@@ -93,7 +93,7 @@ server.listen(PORT, async () => {
   try {
     await connectToDatabase();
     console.log("Database connected");
-    console.log(`Example app listening at http://localhost:${PORT}`);
+    console.log(`Example app listening on port ${PORT}`);
   } catch (err) {
     console.error("Failed to connect to database.", err);
     process.exit(1);
