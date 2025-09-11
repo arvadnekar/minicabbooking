@@ -1,5 +1,6 @@
 'use client';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 import { Testimonial } from './data/testimonials';
 
 interface TestimonialCardProps {
@@ -20,9 +21,11 @@ export const TestimonialCard = ({
   <div className="p-6 bg-gradient-to-br from-white/90 to-gray-100 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
     <div className="flex items-center mb-4 space-x-3">
       {avatarUrl && (
-        <img
+        <Image
           src={avatarUrl}
           alt={name}
+          width={48}
+          height={48}
           className="w-12 h-12 rounded-full object-cover border-2 border-accent"
         />
       )}

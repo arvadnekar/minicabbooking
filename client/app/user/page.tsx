@@ -16,7 +16,7 @@ export default function UserPage() {
 
       if (!res.ok) throw new Error("Unauthorized");
 
-      const data = await res.json();
+      return await res.json();
     };
 
   return (

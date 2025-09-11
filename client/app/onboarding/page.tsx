@@ -9,10 +9,10 @@ import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function OnboardingPage() {
-  const { isLoaded, isSignedIn, getToken, userId } = useAuth();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState(null);
 
   // Sync Clerk user with backend on mount
   useEffect(() => {

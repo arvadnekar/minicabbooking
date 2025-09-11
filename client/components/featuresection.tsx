@@ -12,7 +12,7 @@ export default function Featuresection() {
               Why choose MiniCab?
             </h2>
             <p className="text-xl max-w-3xl mx-auto">
-              We're committed to providing safe, reliable, and affordable transportation for everyone
+              We&#39;re committed to providing safe, reliable, and affordable transportation for everyone
             </p>
           </div>
 

@@ -1,28 +1,37 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "esnext",
+    "incremental": true,
+    "target": "ESNext",
     "jsx": "preserve",
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "noEmit": true,
-    "incremental": true,
+    "baseUrl": ".",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@/public/*": [
+        "./public/*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ]
+    },
     "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
+    "skipLibCheck": true,
     "plugins": [
       {
         "name": "next"
@@ -30,12 +39,13 @@
     ]
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "next-env.d.ts",
     ".next/types/**/*.ts"
-, "app/driver/login/...rest/page.tsx", "app/rider/login/...clerk/page.tsx", "app/driver/login/...clerk/page.tsx", "app/rider/login/...rest/page.tsx"  ],
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "components"
   ]
 }

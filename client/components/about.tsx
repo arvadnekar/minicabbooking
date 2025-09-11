@@ -1,7 +1,7 @@
 // app/about/page.tsx
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 const whatWeStandFor = [
   {
